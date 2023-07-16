@@ -1,6 +1,5 @@
 package com.georgivelev.demoapprestapi.services;
 
-import com.georgivelev.demoapprestapi.appconfig.ApplicationConstants;
 import com.georgivelev.demoapprestapi.dao.repositories.AuthorityRepository;
 import com.georgivelev.demoapprestapi.dao.repositories.UserRepository;
 import com.georgivelev.demoapprestapi.entities.dtos.UserDto;
@@ -41,7 +40,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional()
+    @Transactional
     public UserDto registerUser(UserDto userDto) {
         log.debug("Start registering new  User with username: {}", userDto);
         log.info("Start registering new  User with username: {}", userDto.getEmail());

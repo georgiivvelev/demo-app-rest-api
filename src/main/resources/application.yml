@@ -29,3 +29,12 @@ logging:
         bytecode:
           internal:
             bytebuddy: INFO
+
+application:
+  security:
+    jwt:
+      token:
+        secret-key: ofkq7gWsKV9nb818zCFbODrJFYiKzDLobiRcUyM023uFBk1A8gg3ZgWt/5OjLgNm
+        expiration: 86400000
+      refresh-token:
+        expiration: 604800000
