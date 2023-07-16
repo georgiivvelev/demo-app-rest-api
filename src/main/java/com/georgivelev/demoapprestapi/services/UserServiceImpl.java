@@ -1,5 +1,6 @@
 package com.georgivelev.demoapprestapi.services;
 
+import com.georgivelev.demoapprestapi.appconfig.errors.UserServiceException;
 import com.georgivelev.demoapprestapi.dao.repositories.AuthorityRepository;
 import com.georgivelev.demoapprestapi.dao.repositories.UserRepository;
 import com.georgivelev.demoapprestapi.entities.dtos.UserDto;
@@ -43,10 +44,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto registerUser(UserDto userDto) {
         log.debug("Start registering new  User with username: {}", userDto);
-        log.info("Start registering new  User with username: {}", userDto.getEmail());
-        if (isUserExist(userDto.getEmail()))
-            throw new RuntimeException(String.format("User with username:%s already exists", userDto.getEmail()));
 
+        log.info("Start registering new  User with username: {}", userDto.getEmail());
+        if (isUserExist(userDto.getEmail())) {
+            log.error("Trying saving and user that already exist:{}", userDto);
+            throw new UserServiceException(String.format("User with username:%s already exists", userDto.getEmail()));
+        }
         User student = modelMapper.map(userDto, User.class);
         student.setPassword(passwordEncoder.encode(student.getPassword()));
         student.setUserAuthorities(new HashSet<>());
@@ -66,11 +69,11 @@ public class UserServiceImpl implements UserService {
                 .findUserByEmail(userDto.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException(String.format(NO_SUCH_USER_WITH_PROVIDED_USERNAME, userDto.getEmail())));
 
-       authorities.stream()
+        authorities.stream()
                 .map(a -> authorityRepository.findAuthorityByName(a).orElseGet(() -> new Authority(a)))
                 .forEach(a -> existingUser.getUserAuthorities().add(a));
 
-       User savedUser= userRepository.save(existingUser);
+        User savedUser = userRepository.save(existingUser);
         log.debug("Successfully added authorities {} to UserDto: {}", authorities, savedUser.getEmail());
         log.info("Successfully added authorities {} to user: {}", authorities, savedUser);
         return modelMapper.map(savedUser, UserDto.class);
